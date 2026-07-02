@@ -126,6 +126,27 @@ function ensureRecall() {
   console.log(`ensure-recall: ${action} managed block in ${CLAUDE_MD}; index at ${INDEX}`);
 }
 
+// --- index-add ------------------------------------------------------------
+
+function indexAdd({ name, title, hook }) {
+  if (!name || !title) { console.error('index-add: --name and --title required'); process.exit(1); }
+  ensureIndex();
+  const bullet = `- [${title}](${name}.md) — ${hook ?? ''}`.trimEnd();
+  const text = fs.readFileSync(INDEX, 'utf8');
+  const lines = text.split('\n');
+  const linkTarget = `](${name}.md)`;
+  const idx = lines.findIndex((l) => l.includes(linkTarget));
+  if (idx !== -1) {
+    lines[idx] = bullet;
+    writeFileAtomic(INDEX, lines.join('\n'));
+    console.log(`index-add: updated bullet for ${name}`);
+  } else {
+    const out = text.replace(/\n*$/, '') + '\n' + bullet + '\n';
+    writeFileAtomic(INDEX, out);
+    console.log(`index-add: added bullet for ${name}`);
+  }
+}
+
 // --- dispatch -------------------------------------------------------------
 
 function main() {
@@ -133,6 +154,7 @@ function main() {
   const flags = parseFlags(rest);
   switch (cmd) {
     case 'ensure-recall': ensureRecall(); break;
+    case 'index-add': indexAdd(flags); break;
     default:
       console.error(`unknown command: ${cmd ?? '(none)'}`);
       process.exit(1);

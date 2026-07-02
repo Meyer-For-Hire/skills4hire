@@ -116,3 +116,28 @@ test('ensure-recall leaves an orphan BEGIN marker inert without eating later con
   assert.ok(out.includes('IMPORTANT USER DATA'), 'content after an orphan marker is never deleted');
   assert.equal(count(out, '<!-- END til:global-memory -->'), 1, 'exactly one real end marker');
 });
+
+test('index-add appends a markdown-link bullet', () => {
+  run(['index-add', '--name', 'node-24-native-sqlite',
+       '--title', 'Node 24 native SQLite', '--hook', 'built-in node:sqlite, no dependency']);
+  const idx = read('memory/MEMORY.md');
+  assert.ok(idx.includes('- [Node 24 native SQLite](node-24-native-sqlite.md) — built-in node:sqlite, no dependency'));
+});
+
+test('index-add updates the existing bullet for a slug instead of duplicating', () => {
+  run(['index-add', '--name', 'foo', '--title', 'Foo', '--hook', 'first hook']);
+  run(['index-add', '--name', 'foo', '--title', 'Foo Updated', '--hook', 'second hook']);
+  const idx = read('memory/MEMORY.md');
+  assert.equal(count(idx, '(foo.md)'), 1, 'exactly one bullet for the slug');
+  assert.ok(idx.includes('second hook'), 'hook updated');
+  assert.ok(!idx.includes('first hook'), 'old hook gone');
+  assert.ok(idx.includes('Foo Updated'), 'title updated');
+});
+
+test('index-add creates MEMORY.md with a header if it is missing', () => {
+  // No ensure-recall first: MEMORY.md does not exist yet.
+  run(['index-add', '--name', 'bar', '--title', 'Bar', '--hook', 'hooky']);
+  const idx = read('memory/MEMORY.md');
+  assert.match(idx, /^# Global memory index/);
+  assert.ok(idx.includes('- [Bar](bar.md) — hooky'));
+});

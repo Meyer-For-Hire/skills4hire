@@ -57,19 +57,22 @@ test('ensure-recall preserves pre-existing CLAUDE.md content', () => {
   assert.equal(count(md, '<!-- BEGIN til:global-memory -->'), 1);
 });
 
-test('ensure-recall refreshes a stale block in place without duplicating', () => {
+test('ensure-recall refreshes a stale block in place, preserving surrounding order', () => {
   run(['ensure-recall']);
-  // Corrupt the block body but keep the markers.
   const p = path.join(dir, 'CLAUDE.md');
-  const md = fs.readFileSync(p, 'utf8')
-    .replace('## Global developer knowledge', '## STALE HEADING');
-  fs.writeFileSync(p, md + '\n# trailing user note\n');
+  const block = fs.readFileSync(p, 'utf8').trim();
+  const stale = block.replace('## Global developer knowledge', '## STALE HEADING');
+  // User content on BOTH sides of the block — a refresh must not reorder it.
+  fs.writeFileSync(p, '# My notes\n\n' + stale + '\n\n# trailing note\n');
   run(['ensure-recall']);
   const out = fs.readFileSync(p, 'utf8');
   assert.ok(!out.includes('STALE HEADING'), 'stale content replaced');
   assert.ok(out.includes('## Global developer knowledge'), 'canonical heading restored');
-  assert.ok(out.includes('# trailing user note'), 'trailing user text preserved');
-  assert.equal(count(out, '<!-- BEGIN til:global-memory -->'), 1);
+  assert.equal(count(out, '<!-- BEGIN til:global-memory -->'), 1, 'single block');
+  assert.ok(out.indexOf('# My notes') < out.indexOf('<!-- BEGIN til:global-memory -->'),
+    'user notes stay before the block');
+  assert.ok(out.indexOf('<!-- END til:global-memory -->') < out.indexOf('# trailing note'),
+    'trailing note stays after the block');
 });
 
 test('ensure-recall uses an absolute import path for a non-default config dir', () => {
@@ -100,4 +103,16 @@ test('ensure-recall does not clobber an existing MEMORY.md with content', () => 
   run(['ensure-recall']);
   const idx = read('memory/MEMORY.md');
   assert.ok(idx.includes('- [Existing](existing.md) — keep me'), 'existing index content preserved');
+});
+
+test('ensure-recall leaves an orphan BEGIN marker inert without eating later content', () => {
+  const p = path.join(dir, 'CLAUDE.md');
+  // A BEGIN with no matching END, followed by user data. Even across repeated
+  // runs (which append a real block after it) the user data must survive.
+  fs.writeFileSync(p, '<!-- BEGIN til:global-memory -->\n\nIMPORTANT USER DATA\n');
+  run(['ensure-recall']);
+  run(['ensure-recall']);
+  const out = fs.readFileSync(p, 'utf8');
+  assert.ok(out.includes('IMPORTANT USER DATA'), 'content after an orphan marker is never deleted');
+  assert.equal(count(out, '<!-- END til:global-memory -->'), 1, 'exactly one real end marker');
 });

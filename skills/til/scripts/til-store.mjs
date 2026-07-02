@@ -39,8 +39,9 @@ function readField(fmText, key) {
 
 function writeFileAtomic(file, data) {
   // Write to a temp file in the same dir, then rename — atomic on POSIX, so a
-  // crash / disk-full mid-write can never truncate the real target file.
-  const tmp = `${file}.til-tmp`;
+  // crash / disk-full mid-write can never truncate the real target file. The
+  // pid suffix keeps two concurrent runs from racing on the same temp path.
+  const tmp = `${file}.${process.pid}.til-tmp`;
   fs.writeFileSync(tmp, data);
   fs.renameSync(tmp, file);
 }
@@ -74,30 +75,54 @@ function blockBody() {
 }
 
 function stripBlocks(text) {
-  // Remove every complete BEGIN…END span (handles 0, 1, or many pairs), so a
-  // file that somehow accrued duplicate managed blocks heals to exactly one.
-  // Orphan markers (a BEGIN with no matching END) are left untouched — this
-  // tool never produces them, and dropping to EOF could destroy user content.
-  let out = text;
+  // Remove every well-matched BEGIN…END span (a BEGIN whose next END is not
+  // preceded by another BEGIN), collapsing any number of managed blocks to
+  // none. An orphan BEGIN — no END, or another BEGIN opening before this one
+  // closes — is left inert so it can never pair with a later block's END and
+  // delete the content between them. Returns the healed text and the offset
+  // where the first matched block started (or -1 if none), so ensureRecall can
+  // refresh in place rather than relocating the surviving block to EOF.
+  let out = '';
+  let rest = text;
+  let offset = -1;
   for (;;) {
-    const b = out.indexOf(BEGIN);
-    if (b === -1) break;
-    const e = out.indexOf(END, b);
-    if (e === -1) break;
-    out = out.slice(0, b) + out.slice(e + END.length);
+    const b = rest.indexOf(BEGIN);
+    if (b === -1) { out += rest; break; }
+    const e = rest.indexOf(END, b + BEGIN.length);
+    const nextB = rest.indexOf(BEGIN, b + BEGIN.length);
+    if (e === -1 || (nextB !== -1 && nextB < e)) {
+      out += rest.slice(0, b + BEGIN.length);
+      rest = rest.slice(b + BEGIN.length);
+    } else {
+      out += rest.slice(0, b);
+      if (offset === -1) offset = out.length;
+      rest = rest.slice(e + END.length);
+    }
   }
-  return out;
+  return { text: out, offset };
+}
+
+function spliceBlock(text, at, block) {
+  // Insert block at offset `at`, separated from surrounding content by a single
+  // blank line, with exactly one trailing newline.
+  const before = text.slice(0, at).replace(/\s+$/, '');
+  const after = text.slice(at).replace(/^\s+/, '');
+  let out = '';
+  if (before) out += `${before}\n\n`;
+  out += block;
+  if (after) out += `\n\n${after}`;
+  return `${out.replace(/\n*$/, '')}\n`;
 }
 
 function ensureRecall() {
   ensureIndex();
   const existed = fs.existsSync(CLAUDE_MD);
   const original = existed ? fs.readFileSync(CLAUDE_MD, 'utf8') : '';
-  const had = original.includes(BEGIN);
-  const stripped = stripBlocks(original).replace(/\n+$/, '');
-  const out = stripped.length ? `${stripped}\n\n${blockBody()}\n` : `${blockBody()}\n`;
+  const { text: stripped, offset } = stripBlocks(original);
+  const at = offset !== -1 ? offset : stripped.length;
+  const out = spliceBlock(stripped, at, blockBody());
+  const action = offset !== -1 ? 'refreshed' : original.trim() ? 'appended' : 'created';
   writeFileAtomic(CLAUDE_MD, out);
-  const action = had ? 'refreshed' : existed ? 'appended' : 'created';
   console.log(`ensure-recall: ${action} managed block in ${CLAUDE_MD}; index at ${INDEX}`);
 }
 

@@ -169,3 +169,10 @@ test('find-dupe prints nothing and exits 0 when there is no match', () => {
   const out = run(['find-dupe', '--slug', 'nope']);
   assert.equal(out.trim(), '');
 });
+
+test('find-dupe treats a missing --slug as a usage error (nonzero exit)', () => {
+  // A no-match exits 0, but omitting the required flag is a caller bug and must
+  // fail loudly — consistent with index-add/promote — never silently report
+  // "no duplicate" (which could let the skill create a dup).
+  assert.throws(() => run(['find-dupe']), /status 1|Command failed/);
+});

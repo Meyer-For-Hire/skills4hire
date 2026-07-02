@@ -1,0 +1,80 @@
+import { test, beforeEach, afterEach } from 'node:test';
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+const SCRIPT = new URL('./til-store.mjs', import.meta.url).pathname;
+
+let dir;
+beforeEach(() => { dir = fs.mkdtempSync(path.join(os.tmpdir(), 'til-')); });
+afterEach(() => { fs.rmSync(dir, { recursive: true, force: true }); });
+
+function run(args, env = {}) {
+  return execFileSync('node', [SCRIPT, ...args], {
+    env: { ...process.env, CLAUDE_CONFIG_DIR: dir, ...env },
+    encoding: 'utf8',
+  });
+}
+const read = (p) => fs.readFileSync(path.join(dir, p), 'utf8');
+const count = (s, sub) => s.split(sub).length - 1;
+
+test('ensure-recall bootstraps store and index on an empty config dir', () => {
+  run(['ensure-recall']);
+  assert.ok(fs.existsSync(path.join(dir, 'memory')), 'memory/ created');
+  assert.match(read('memory/MEMORY.md'), /^# Global memory index/);
+});
+
+test('ensure-recall creates the managed block with a bare import line', () => {
+  // Point HOME at the test's temp dir so the config dir IS $HOME/.claude and
+  // the ~ import rendering is exercised — without touching the real home dir.
+  const cfg = path.join(dir, '.claude');
+  execFileSync('node', [SCRIPT, 'ensure-recall'], {
+    env: { ...process.env, HOME: dir, CLAUDE_CONFIG_DIR: cfg }, encoding: 'utf8',
+  });
+  const md = fs.readFileSync(path.join(cfg, 'CLAUDE.md'), 'utf8');
+  assert.ok(md.includes('<!-- BEGIN til:global-memory -->'), 'has BEGIN marker');
+  assert.ok(md.includes('<!-- END til:global-memory -->'), 'has END marker');
+  assert.match(md, /^@~\/\.claude\/memory\/MEMORY\.md$/m, 'bare ~ import line present');
+});
+
+test('ensure-recall is idempotent — exactly one block after two runs', () => {
+  run(['ensure-recall']);
+  const first = read('CLAUDE.md');
+  run(['ensure-recall']);
+  const second = read('CLAUDE.md');
+  assert.equal(count(second, '<!-- BEGIN til:global-memory -->'), 1);
+  assert.equal(first, second, 'second run leaves the file byte-identical');
+});
+
+test('ensure-recall preserves pre-existing CLAUDE.md content', () => {
+  fs.writeFileSync(path.join(dir, 'CLAUDE.md'), '# My notes\n\nkeep me\n');
+  run(['ensure-recall']);
+  const md = read('CLAUDE.md');
+  assert.ok(md.includes('# My notes'), 'user heading kept');
+  assert.ok(md.includes('keep me'), 'user body kept');
+  assert.equal(count(md, '<!-- BEGIN til:global-memory -->'), 1);
+});
+
+test('ensure-recall refreshes a stale block in place without duplicating', () => {
+  run(['ensure-recall']);
+  // Corrupt the block body but keep the markers.
+  const p = path.join(dir, 'CLAUDE.md');
+  const md = fs.readFileSync(p, 'utf8')
+    .replace('## Global developer knowledge', '## STALE HEADING');
+  fs.writeFileSync(p, md + '\n# trailing user note\n');
+  run(['ensure-recall']);
+  const out = fs.readFileSync(p, 'utf8');
+  assert.ok(!out.includes('STALE HEADING'), 'stale content replaced');
+  assert.ok(out.includes('## Global developer knowledge'), 'canonical heading restored');
+  assert.ok(out.includes('# trailing user note'), 'trailing user text preserved');
+  assert.equal(count(out, '<!-- BEGIN til:global-memory -->'), 1);
+});
+
+test('ensure-recall uses an absolute import path for a non-default config dir', () => {
+  // dir is a temp dir, i.e. NOT $HOME/.claude, so the import must be absolute.
+  run(['ensure-recall']);
+  const md = read('CLAUDE.md');
+  assert.match(md, new RegExp('^@' + dir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '/memory/MEMORY\\.md$', 'm'));
+});

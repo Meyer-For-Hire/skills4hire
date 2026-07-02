@@ -174,7 +174,7 @@ test('find-dupe treats a missing --slug as a usage error (nonzero exit)', () => 
   // A no-match exits 0, but omitting the required flag is a caller bug and must
   // fail loudly — consistent with index-add/promote — never silently report
   // "no duplicate" (which could let the skill create a dup).
-  assert.throws(() => run(['find-dupe']), /status 1|Command failed/);
+  assert.throws(() => run(['find-dupe']), (err) => err.status === 1);
 });
 
 function seedProjectMemory() {
@@ -216,6 +216,9 @@ test('promote refuses to overwrite a different global file on a slug clash', () 
   const src = seedProjectMemory();
   fs.mkdirSync(path.join(dir, 'memory'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'memory', 'flag-parsing.md'), 'different content\n');
-  assert.throws(() => run(['promote', '--from', src]), /status 2|Command failed/);
+  // Assert on the exit code itself — execFileSync's error message always
+  // contains "Command failed" regardless of code, so a message regex can't
+  // distinguish a real exit-2 clash refusal from any other failure.
+  assert.throws(() => run(['promote', '--from', src]), (err) => err.status === 2);
   assert.equal(read('memory/flag-parsing.md'), 'different content\n', 'existing file untouched');
 });

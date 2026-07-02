@@ -141,3 +141,31 @@ test('index-add creates MEMORY.md with a header if it is missing', () => {
   assert.match(idx, /^# Global memory index/);
   assert.ok(idx.includes('- [Bar](bar.md) — hooky'));
 });
+
+test('list prints slug and description for each memory, skipping MEMORY.md', () => {
+  fs.mkdirSync(path.join(dir, 'memory'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'memory', 'MEMORY.md'), '# Global memory index\n');
+  fs.writeFileSync(path.join(dir, 'memory', 'a-fact.md'),
+    '---\nname: a-fact\ndescription: A described fact.\nmetadata:\n  type: knowledge\n---\nbody\n');
+  const out = run(['list']);
+  assert.ok(out.includes('a-fact'), 'slug listed');
+  assert.ok(out.includes('A described fact.'), 'description listed');
+  assert.ok(!out.includes('MEMORY'), 'index file skipped');
+});
+
+test('list prints nothing for an empty/absent store', () => {
+  const out = run(['list']);
+  assert.equal(out.trim(), '');
+});
+
+test('find-dupe prints the path on an exact slug match', () => {
+  fs.mkdirSync(path.join(dir, 'memory'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'memory', 'dup.md'), '---\nname: dup\n---\nx\n');
+  const out = run(['find-dupe', '--slug', 'dup']).trim();
+  assert.equal(out, path.join(dir, 'memory', 'dup.md'));
+});
+
+test('find-dupe prints nothing and exits 0 when there is no match', () => {
+  const out = run(['find-dupe', '--slug', 'nope']);
+  assert.equal(out.trim(), '');
+});

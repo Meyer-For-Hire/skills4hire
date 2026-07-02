@@ -147,6 +147,26 @@ function indexAdd({ name, title, hook }) {
   }
 }
 
+// --- list & find-dupe -----------------------------------------------------
+
+function list() {
+  if (!fs.existsSync(MEMORY_DIR)) return;
+  const files = fs.readdirSync(MEMORY_DIR)
+    .filter((f) => f.endsWith('.md') && f !== 'MEMORY.md');
+  for (const f of files.sort()) {
+    const { fm } = splitFrontmatter(fs.readFileSync(path.join(MEMORY_DIR, f), 'utf8'));
+    const slug = readField(fm, 'name') || f.replace(/\.md$/, '');
+    const desc = readField(fm, 'description') || '';
+    console.log(`${slug}\t${desc}`);
+  }
+}
+
+function findDupe({ slug }) {
+  if (!slug) { console.error('find-dupe: --slug required'); process.exit(1); }
+  const p = path.join(MEMORY_DIR, `${slug}.md`);
+  if (fs.existsSync(p)) console.log(p);
+}
+
 // --- dispatch -------------------------------------------------------------
 
 function main() {
@@ -155,6 +175,8 @@ function main() {
   switch (cmd) {
     case 'ensure-recall': ensureRecall(); break;
     case 'index-add': indexAdd(flags); break;
+    case 'list': list(); break;
+    case 'find-dupe': findDupe(flags); break;
     default:
       console.error(`unknown command: ${cmd ?? '(none)'}`);
       process.exit(1);

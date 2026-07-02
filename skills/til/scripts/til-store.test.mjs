@@ -176,3 +176,46 @@ test('find-dupe treats a missing --slug as a usage error (nonzero exit)', () => 
   // "no duplicate" (which could let the skill create a dup).
   assert.throws(() => run(['find-dupe']), /status 1|Command failed/);
 });
+
+function seedProjectMemory() {
+  const projDir = path.join(dir, 'projects', '-Users-jim-work-demo', 'memory');
+  fs.mkdirSync(projDir, { recursive: true });
+  const file = path.join(projDir, 'flag-parsing.md');
+  fs.writeFileSync(file,
+    '---\n' +
+    'name: flag-parsing\n' +
+    'description: How the demo app parses flags.\n' +
+    'metadata:\n' +
+    '  node_type: memory\n' +
+    '  type: project\n' +
+    '  originSessionId: sess-123\n' +
+    '---\n' +
+    'The demo app parses flags with a hand-rolled loop.\n');
+  return file;
+}
+
+test('promote copies to the global store, mutating metadata and keeping the body', () => {
+  const src = seedProjectMemory();
+  run(['promote', '--from', src]);
+  const g = read('memory/flag-parsing.md');
+  assert.ok(g.includes('scope: global'), 'scope set to global');
+  assert.ok(g.includes('promotedFrom: -Users-jim-work-demo'), 'promotedFrom derived from path');
+  assert.ok(g.includes('originSessionId: sess-123'), 'originSessionId preserved');
+  assert.ok(g.includes('hand-rolled loop'), 'body preserved');
+});
+
+test('promote leaves the project original untouched and adds an index bullet', () => {
+  const src = seedProjectMemory();
+  run(['promote', '--from', src]);
+  const original = fs.readFileSync(src, 'utf8');
+  assert.ok(!original.includes('scope: global'), 'original not mutated');
+  assert.ok(read('memory/MEMORY.md').includes('(flag-parsing.md)'), 'index bullet added');
+});
+
+test('promote refuses to overwrite a different global file on a slug clash', () => {
+  const src = seedProjectMemory();
+  fs.mkdirSync(path.join(dir, 'memory'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'memory', 'flag-parsing.md'), 'different content\n');
+  assert.throws(() => run(['promote', '--from', src]), /status 2|Command failed/);
+  assert.equal(read('memory/flag-parsing.md'), 'different content\n', 'existing file untouched');
+});

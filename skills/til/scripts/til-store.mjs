@@ -167,6 +167,53 @@ function findDupe({ slug }) {
   if (fs.existsSync(p)) console.log(p);
 }
 
+// --- promote --------------------------------------------------------------
+
+function projectSlugFromPath(p) {
+  const norm = p.replace(/\\/g, '/');
+  const m = norm.match(/projects\/([^/]+)\/memory\//);
+  return m ? m[1] : path.basename(path.dirname(p));
+}
+
+function upsertMetaField(fmText, key, value) {
+  const lines = fmText.split('\n');
+  const metaIdx = lines.findIndex((l) => /^metadata:\s*$/.test(l));
+  if (metaIdx === -1) { lines.push('metadata:', `  ${key}: ${value}`); return lines.join('\n'); }
+  for (let i = metaIdx + 1; i < lines.length; i++) {
+    if (/^\S/.test(lines[i])) break; // left the indented metadata block
+    const km = lines[i].match(/^\s+([A-Za-z0-9_]+):/);
+    if (km && km[1] === key) { lines[i] = `  ${key}: ${value}`; return lines.join('\n'); }
+  }
+  lines.splice(metaIdx + 1, 0, `  ${key}: ${value}`);
+  return lines.join('\n');
+}
+
+function promote({ from, as }) {
+  if (!from) { console.error('promote: --from <file> required'); process.exit(1); }
+  const srcText = fs.readFileSync(from, 'utf8');
+  const { fm, body } = splitFrontmatter(srcText);
+  if (fm === null) { console.error('promote: source has no frontmatter'); process.exit(1); }
+  const slug = as || readField(fm, 'name') || path.basename(from, '.md');
+  const target = path.join(MEMORY_DIR, `${slug}.md`);
+
+  let newFm = upsertMetaField(fm, 'scope', 'global');
+  newFm = upsertMetaField(newFm, 'promotedFrom', projectSlugFromPath(from));
+  const out = `---\n${newFm}\n---\n${body}`;
+
+  ensureIndex();
+  if (fs.existsSync(target)) {
+    if (fs.readFileSync(target, 'utf8') === out) {
+      console.log(`promote: ${slug} already promoted (no change)`);
+      return;
+    }
+    console.error(`promote: ${target} already exists with different content; pass --as <slug>`);
+    process.exit(2);
+  }
+  writeFileAtomic(target, out);
+  indexAdd({ name: slug, title: readField(fm, 'name') || slug, hook: readField(fm, 'description') || '' });
+  console.log(`promote: wrote ${target}`);
+}
+
 // --- dispatch -------------------------------------------------------------
 
 function main() {
@@ -177,6 +224,7 @@ function main() {
     case 'index-add': indexAdd(flags); break;
     case 'list': list(); break;
     case 'find-dupe': findDupe(flags); break;
+    case 'promote': promote(flags); break;
     default:
       console.error(`unknown command: ${cmd ?? '(none)'}`);
       process.exit(1);

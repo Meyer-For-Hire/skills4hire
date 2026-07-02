@@ -1,0 +1,9 @@
+{
+  "name": "skills4hire",
+  "description": "Skills for capturing and recalling reusable developer knowledge across projects.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Meyer For Hire Consulting, LLC"
+  },
+  "keywords": ["skills", "memory", "knowledge", "til", "developer-knowledge", "global-memory"]
+}

@@ -40,13 +40,22 @@ The first time `/til` runs it adds an `@import` to `~/.claude/CLAUDE.md`; Claude
 Code shows a one-time approval dialog — approve it once and global memories load
 in every future session.
 
-**Local development / dev-load:** installing from the marketplace clones from
-GitHub, so it needs `skills4hire` pushed. To try `/til` from the local checkout
-before publishing, symlink the skill into your skills dir and restart:
+**Local development.** Two ways to exercise the work before publishing:
 
-```bash
-mkdir -p ~/.claude/skills
-ln -s /Users/jim/work/skills4hire/skills/til ~/.claude/skills/til
-```
+- **Test the helper directly** — its commands are plain Node and honor
+  `CLAUDE_CONFIG_DIR`, so you can drive them against a throwaway store without
+  installing anything:
 
-It then loads next session as `til@skills-dir`. Remove the symlink to undo.
+  ```bash
+  CLAUDE_CONFIG_DIR=$(mktemp -d) node skills/til/scripts/til-store.mjs ensure-recall
+  ```
+
+  Run the test suite with `node --test 'skills/til/scripts/*.test.mjs'` (use the
+  glob form — the bare-directory form is unreliable on Node 26.x).
+
+- **Exercise the real `/til` slash command** — this needs a full plugin install
+  so that `${CLAUDE_PLUGIN_ROOT}` resolves, since `SKILL.md` invokes the helper
+  through that variable. It is **not** set for a bare `~/.claude/skills` symlink
+  (`@skills-dir` load), so that shortcut leaves `/til`'s commands unresolved.
+  Install via the marketplace once the repo is pushed:
+  `/plugin install skills4hire@m4h-marketplace`.

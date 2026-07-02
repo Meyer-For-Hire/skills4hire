@@ -78,3 +78,26 @@ test('ensure-recall uses an absolute import path for a non-default config dir', 
   const md = read('CLAUDE.md');
   assert.match(md, new RegExp('^@' + dir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '/memory/MEMORY\\.md$', 'm'));
 });
+
+test('ensure-recall heals a CLAUDE.md that already has two managed blocks', () => {
+  run(['ensure-recall']);
+  const p = path.join(dir, 'CLAUDE.md');
+  const block = fs.readFileSync(p, 'utf8').trim();
+  // Two complete blocks with user text between them, as a bad merge/copy-paste
+  // might produce. The tool must collapse this back to exactly one block.
+  fs.writeFileSync(p, block + '\n\n# user notes\n\n' + block + '\n');
+  run(['ensure-recall']);
+  const out = fs.readFileSync(p, 'utf8');
+  assert.equal(count(out, '<!-- BEGIN til:global-memory -->'), 1, 'exactly one begin marker');
+  assert.equal(count(out, '<!-- END til:global-memory -->'), 1, 'exactly one end marker');
+  assert.ok(out.includes('# user notes'), 'user text between the blocks preserved');
+});
+
+test('ensure-recall does not clobber an existing MEMORY.md with content', () => {
+  fs.mkdirSync(path.join(dir, 'memory'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'memory', 'MEMORY.md'),
+    '# Global memory index\n\n- [Existing](existing.md) — keep me\n');
+  run(['ensure-recall']);
+  const idx = read('memory/MEMORY.md');
+  assert.ok(idx.includes('- [Existing](existing.md) — keep me'), 'existing index content preserved');
+});

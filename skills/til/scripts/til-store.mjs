@@ -37,9 +37,17 @@ function readField(fmText, key) {
   return m ? m[1].trim().replace(/^["']|["']$/g, '') : null;
 }
 
+function writeFileAtomic(file, data) {
+  // Write to a temp file in the same dir, then rename — atomic on POSIX, so a
+  // crash / disk-full mid-write can never truncate the real target file.
+  const tmp = `${file}.til-tmp`;
+  fs.writeFileSync(tmp, data);
+  fs.renameSync(tmp, file);
+}
+
 function ensureIndex() {
   fs.mkdirSync(MEMORY_DIR, { recursive: true });
-  if (!fs.existsSync(INDEX)) fs.writeFileSync(INDEX, INDEX_HEADER + '\n');
+  if (!fs.existsSync(INDEX)) writeFileAtomic(INDEX, INDEX_HEADER + '\n');
 }
 
 // --- ensure-recall --------------------------------------------------------
@@ -65,25 +73,31 @@ function blockBody() {
   ].join('\n');
 }
 
+function stripBlocks(text) {
+  // Remove every complete BEGIN…END span (handles 0, 1, or many pairs), so a
+  // file that somehow accrued duplicate managed blocks heals to exactly one.
+  // Orphan markers (a BEGIN with no matching END) are left untouched — this
+  // tool never produces them, and dropping to EOF could destroy user content.
+  let out = text;
+  for (;;) {
+    const b = out.indexOf(BEGIN);
+    if (b === -1) break;
+    const e = out.indexOf(END, b);
+    if (e === -1) break;
+    out = out.slice(0, b) + out.slice(e + END.length);
+  }
+  return out;
+}
+
 function ensureRecall() {
   ensureIndex();
   const existed = fs.existsSync(CLAUDE_MD);
-  const text = existed ? fs.readFileSync(CLAUDE_MD, 'utf8') : '';
-  const b = text.indexOf(BEGIN);
-  const e = text.indexOf(END);
-  let out;
-  let action;
-  if (b !== -1 && e !== -1 && e > b) {
-    out = text.slice(0, b) + blockBody() + text.slice(e + END.length);
-    action = 'refreshed';
-  } else if (text.length) {
-    out = text.replace(/\n*$/, '') + '\n\n' + blockBody() + '\n';
-    action = 'appended';
-  } else {
-    out = blockBody() + '\n';
-    action = 'created';
-  }
-  fs.writeFileSync(CLAUDE_MD, out);
+  const original = existed ? fs.readFileSync(CLAUDE_MD, 'utf8') : '';
+  const had = original.includes(BEGIN);
+  const stripped = stripBlocks(original).replace(/\n+$/, '');
+  const out = stripped.length ? `${stripped}\n\n${blockBody()}\n` : `${blockBody()}\n`;
+  writeFileAtomic(CLAUDE_MD, out);
+  const action = had ? 'refreshed' : existed ? 'appended' : 'created';
   console.log(`ensure-recall: ${action} managed block in ${CLAUDE_MD}; index at ${INDEX}`);
 }
 

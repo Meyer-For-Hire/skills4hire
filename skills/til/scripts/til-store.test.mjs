@@ -222,3 +222,31 @@ test('promote refuses to overwrite a different global file on a slug clash', () 
   assert.throws(() => run(['promote', '--from', src]), (err) => err.status === 2);
   assert.equal(read('memory/flag-parsing.md'), 'different content\n', 'existing file untouched');
 });
+
+test('promote --as <slug> keeps filename, frontmatter name, and index in sync', () => {
+  const src = seedProjectMemory(); // frontmatter name: flag-parsing
+  run(['promote', '--from', src, '--as', 'demo-flag-parsing']);
+  const g = read('memory/demo-flag-parsing.md');
+  assert.ok(g.includes('name: demo-flag-parsing'), 'frontmatter name rewritten to the --as slug');
+  assert.ok(!g.includes('name: flag-parsing\n'), 'stale original name not left in frontmatter');
+  assert.ok(read('memory/MEMORY.md').includes('(demo-flag-parsing.md)'), 'index links the new slug');
+  // list reads the frontmatter name; it must report the new slug, not the old one.
+  const slugCol = run(['list']).trim().split('\t')[0];
+  assert.equal(slugCol, 'demo-flag-parsing', 'list reports the renamed slug');
+  // A second identical --as promote is idempotent (byte-identical → exit 0, no throw).
+  const out = run(['promote', '--from', src, '--as', 'demo-flag-parsing']);
+  assert.match(out, /already promoted/);
+});
+
+test('promote reports a clean error (exit 1) for an unreadable --from', () => {
+  const missing = path.join(dir, 'does-not-exist.md');
+  assert.throws(
+    () => run(['promote', '--from', missing]),
+    (err) => {
+      assert.equal(err.status, 1, 'exits 1 like the other usage-error guards');
+      assert.match(err.stderr, /promote: cannot read --from/, 'clean one-line message');
+      assert.doesNotMatch(err.stderr, /^\s+at /m, 'no raw stack frames leaked');
+      return true;
+    },
+  );
+});

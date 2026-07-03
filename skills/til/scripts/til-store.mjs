@@ -188,15 +188,32 @@ function upsertMetaField(fmText, key, value) {
   return lines.join('\n');
 }
 
+function setNameField(fmText, value) {
+  // Replace the top-level `name:` line (m-flag anchors to line start, so indented
+  // metadata sub-keys are never touched); prepend one if the source lacks it.
+  if (/^name:\s*.*$/m.test(fmText)) return fmText.replace(/^name:\s*.*$/m, `name: ${value}`);
+  return `name: ${value}\n${fmText}`;
+}
+
 function promote({ from, as }) {
   if (!from) { console.error('promote: --from <file> required'); process.exit(1); }
-  const srcText = fs.readFileSync(from, 'utf8');
+  let srcText;
+  try {
+    srcText = fs.readFileSync(from, 'utf8');
+  } catch (e) {
+    console.error(`promote: cannot read --from ${from}: ${e.code || e.message}`);
+    process.exit(1);
+  }
   const { fm, body } = splitFrontmatter(srcText);
   if (fm === null) { console.error('promote: source has no frontmatter'); process.exit(1); }
   const slug = as || readField(fm, 'name') || path.basename(from, '.md');
   const target = path.join(MEMORY_DIR, `${slug}.md`);
 
-  let newFm = upsertMetaField(fm, 'scope', 'global');
+  // Rewrite the frontmatter name to the target slug so the file's internal name,
+  // its filename, and the index bullet stay in sync (matters on --as renames; a
+  // no-op when slug already equals the source name).
+  let newFm = setNameField(fm, slug);
+  newFm = upsertMetaField(newFm, 'scope', 'global');
   newFm = upsertMetaField(newFm, 'promotedFrom', projectSlugFromPath(from));
   const out = `---\n${newFm}\n---\n${body}`;
 
@@ -210,7 +227,7 @@ function promote({ from, as }) {
     process.exit(2);
   }
   writeFileAtomic(target, out);
-  indexAdd({ name: slug, title: readField(fm, 'name') || slug, hook: readField(fm, 'description') || '' });
+  indexAdd({ name: slug, title: slug, hook: readField(fm, 'description') || '' });
   console.log(`promote: wrote ${target}`);
 }
 

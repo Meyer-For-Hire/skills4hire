@@ -4,7 +4,14 @@ Skills for capturing and recalling reusable developer knowledge across projects.
 
 ## Skills
 
-_None published yet._
+### pqa-mode
+
+Enter **PQA** — Precision Question and Answer. Every reply is the tightest thing
+that carries the meaning: one of five forms (yes/no, a number, a date, a bulleted
+list, or "I don't know, but I think …" + one of those), or a single concise
+question. No preamble, no offers, no decoration. Stays active until you leave it.
+
+**Invoke:** `/skills4hire:pqa-mode` or `/pqa-mode`
 
 ## Installation
 

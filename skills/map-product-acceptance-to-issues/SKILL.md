@@ -9,14 +9,14 @@ Once a feature's implementation work exists in the tracker, give each **product 
 
 **The reference is one-directional and lives only on the acceptance side.** Write it **on the acceptance-criterion issue, pointing _to_ the implementation work.** Do **not** write anything onto the implementation epic/milestone/issue, and do **not** create a two-way tracker relation. The implementing agent is fenced off from acceptance tests: from an acceptance-criterion issue you must be able to reach its implementation, but from an implementation issue there must be **no trace** of the acceptance criteria. (The tracker's one-way reference mechanism is in `docs/agents/issue-tracker.md` — use it; don't reach for a symmetric "relates to"/"blocks" relation, which surfaces on both issues.)
 
-This skill records references on existing issues; it does not create issues, author criteria, or read the tech spec. Technical acceptance criteria aren't handled here — they ride along in the slices via `/to-issues`.
+This skill records references on existing issues; it does not create issues, author criteria, or read the tech spec. Technical acceptance criteria aren't handled here — they ride along in the slices, folded in by whoever runs `/to-tickets`.
 
 ## Prerequisites
 
 Stop and say what's missing if any of these aren't true:
 
 - The **product acceptance-criteria issues** exist with stable IDs (from `/prd-to-acceptance-issues`).
-- The **implementation work** exists and is organized under epics/milestones (from `/to-issues` and planning).
+- The **implementation work** exists and is organized under epics/milestones (from `/to-tickets` and planning).
 - The epic/milestone structure and the tracker are configured — see `docs/agents/document-locations.md` and `docs/agents/issue-tracker.md`.
 
 ## Process

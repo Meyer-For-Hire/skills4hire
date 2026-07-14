@@ -1,8 +1,6 @@
 # skills4hire
 
-Skills for capturing and recalling reusable developer knowledge across projects.
-
-**Repo axis:** `skills4hire` = skills you use in conversation. Dispatchable agents (e.g. `well-factored-code-auditor`) live in [agents4hire](https://github.com/Meyer-For-Hire/agents4hire).
+A collection of useful skills for many purposes, brought to you by [Meyer For Hire](https://meyer4hire.com/).
 
 ## Skills
 
@@ -27,7 +25,7 @@ The flow, roughly in order:
 2. [`/create-prd-from-convo`](skills/create-prd-from-convo/SKILL.md) — synthesize a product/UX PRD (with a BDD acceptance-criteria section) and publish it to the configured PRD location. Writes a document; creates no issues. *(user-invoked)*
 3. **After PRD review:** [`/prd-to-acceptance-issues`](skills/prd-to-acceptance-issues/SKILL.md) — publish the PRD's criteria as one sub-issue per Requirement (stable criterion IDs) in the product tracker. *(user-invoked)*
 4. [`/create-tech-spec-from-convo`](skills/create-tech-spec-from-convo/SKILL.md) — synthesize the technical half (seam analysis, implementation + testing decisions, and **technical acceptance criteria** by category: performance, scale, privacy, security) into a tech spec. *(user-invoked)*
-5. **After tech-spec review:** Pocock's `/to-issues` creates the implementation slices, folding each technical acceptance criterion into the slice it applies to. Then `/map-product-acceptance-to-issues` records a one-way reference from each product acceptance criterion to the implementation work after which it's testable (the implementation side stays clean), flagging any criterion no work covers.
+5. **After tech-spec review:** Run Pocock's `/to-tickets` to turn the spec into implementation tickets (tracer-bullet vertical slices with explicit blocking edges) — fold each technical acceptance criterion into the ticket(s) it applies to as you draft them; `/to-tickets` doesn't distribute them automatically, so call it out when you invoke it. Then `/map-product-acceptance-to-issues` records a one-way reference from each product acceptance criterion to the implementation work after which it's testable (the implementation side stays clean), flagging any criterion no work covers.
 
 Composed disciplines *(model-invoked — reached by the above or autonomously)*:
 

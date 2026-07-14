@@ -7,13 +7,13 @@ Edit the values in each row to match this repo. Skills should treat the **Locati
 | Document | Created / found at | Linked from | Notes |
 | --- | --- | --- | --- |
 | **PRD** | Google Docs — Drive folder `<DRIVE_FOLDER_OR_URL>` | the product epic | Product/UX PRD. No `ready-for-agent` label — enters product review. Written by `/create-prd-from-convo`. |
-| **Tech spec** | Google Docs — Drive folder `<DRIVE_FOLDER_OR_URL>` | the product epic | Technical-design output. Enters technical review; `/to-issues` mints the `ready-for-agent` implementation issues downstream. Written by `/create-tech-spec-from-convo`. |
+| **Tech spec** | Google Docs — Drive folder `<DRIVE_FOLDER_OR_URL>` | the product epic | Technical-design output. Enters technical review; `/to-tickets` mints the `ready-for-agent` implementation issues downstream. Written by `/create-tech-spec-from-convo`. |
 | **Acceptance criteria** | authored in the PRD (Acceptance Criteria section), then published as Linear sub-issues under the product epic | the PRD (by Linear ID, written back) | One sub-issue per Requirement. The Linear issue ID is the stable criterion ID. Authored by `/defining-acceptance-criteria` (as PRD text); published as issues by the acceptance-criteria → issues step. See `issue-tracker.md` for how. |
 | **Product epic** | Linear — team `<LINEAR_TEAM>`, project `<LINEAR_PROJECT>` | — | The parent the PRD links to and the criteria sub-issues hang under. |
 
 ## Conventions
 
-- **PRD and tech spec → Google Docs**, each linked from the product epic. Neither carries the `ready-for-agent` label; that label belongs to implementation issues minted later by `/to-issues`.
+- **PRD and tech spec → Google Docs**, each linked from the product epic. Neither carries the `ready-for-agent` label; that label belongs to implementation issues minted later by `/to-tickets`.
 - **Acceptance criteria** are authored as a section of the PRD, then published as Linear sub-issues of the product epic in a separate step. Once published, Linear is the source of truth for tracking; the PRD's criteria carry their Linear IDs.
 - If a document type's location is blank, the relevant skill should stop and ask rather than guess.
 

@@ -7,7 +7,7 @@ description: Use when sharpening a product's ubiquitous language or domain termi
 
 Actively build and sharpen the project's **ubiquitous language** with a product owner. Challenge terms, invent edge-case scenarios, and write the glossary down the moment terms crystallise. The point is precise, shared vocabulary that the PRD and the BDD acceptance criteria will reuse word-for-word — consistent nouns and verbs are what make downstream criteria (and later their tests) coherent.
 
-This is the product-definition counterpart to `/domain-modeling`, with the engineering concerns (ADRs, code cross-referencing) left out.
+This is the product-definition counterpart to `/domain-modeling` — a fork of its discipline for the PM track, with the engineering concerns (ADRs, code cross-referencing) left out. See [Coexisting with `/domain-modeling`](#coexisting-with-domain-modeling) below for how the two share `CONTEXT.md`.
 
 ## What this session does
 
@@ -36,6 +36,10 @@ _Avoid_: user
 ```
 Be opinionated — when several words mean one concept, pick one and list the rest under `_Avoid_`. Keep definitions to a sentence or two: what it IS, not what it does. Only terms specific to this product's domain — general programming concepts don't belong.
 </context-format>
+
+## Coexisting with `/domain-modeling`
+
+If this repo also runs Pocock's `/domain-modeling` (engineering track), both skills write `CONTEXT.md` — **neither owns the file exclusively.** The format above is the interface between them: whichever skill resolves a term next reads what's already there, matches its existing conventions (grouping, phrasing, `_Avoid_` lists), and appends or amends in place rather than restructuring around its own pass. Same layout rule as `/domain-modeling` applies — a single root `CONTEXT.md`, or a root `CONTEXT-MAP.md` for multiple contexts (see `docs/agents/domain.md`, written by `/setup-matt-pocock-skills`, if present). Don't invent a second convention for where the file lives.
 
 ## Out of scope for this session
 

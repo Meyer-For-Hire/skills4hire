@@ -16,7 +16,7 @@ A skill should resolve these to IDs with `list_teams` / `list_projects` / `list_
 | Issue kind | Created by | Tracker | `ready-for-agent`? |
 | --- | --- | --- | --- |
 | Acceptance criteria (1 per Requirement) | `/prd-to-acceptance-issues` | **Product** | no |
-| Implementation slices (vertical tracer bullets; each carries the technical acceptance criteria it covers) | `/to-issues` | **Engineering** | yes |
+| Implementation slices (vertical tracer bullets; each carries the technical acceptance criteria it covers) | `/to-tickets` | **Engineering** | yes |
 
 `/map-product-acceptance-to-issues` does not create issues — it records a **one-way** reference on each product acceptance-criterion issue pointing to the implementation work after which it's testable (see "One-way anchoring" below). Technical acceptance criteria are authored in the tech spec and folded into the slices above; they are not separate issues.
 
@@ -47,7 +47,7 @@ A **product epic** is a regular Linear issue used as the parent. The PRD links f
 
 ## Triage labels
 
-This flow does **not** apply the `ready-for-agent` label — PRDs and tech specs enter human review, and implementation issues are minted later by `/to-issues`. If this repo also runs the Pocock triage skills, their label vocabulary lives in `docs/agents/triage-labels.md`.
+This flow does **not** apply the `ready-for-agent` label — PRDs and tech specs enter human review, and implementation issues are minted later by `/to-tickets`. If this repo also runs the Pocock triage skills, their label vocabulary lives in `docs/agents/triage-labels.md`.
 
 ## When a skill says "publish to the issue tracker"
 

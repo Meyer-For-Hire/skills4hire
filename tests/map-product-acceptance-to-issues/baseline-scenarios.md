@@ -2,7 +2,7 @@
 
 Tests how an agent behaves when asked to map product acceptance-criteria issues to the milestones after which they're testable — **without** the skill.
 
-(Renamed and refocused from `check-acceptance-coverage`. The skill no longer creates technical-acceptance issues — those live in the tech spec and are folded into slices by `/to-issues`. Its job is now: link each *product* criterion to the epic/milestone after which it's testable, and flag any criterion no planned work covers.)
+(Renamed and refocused from `check-acceptance-coverage`. The skill no longer creates technical-acceptance issues — those live in the tech spec and are folded into slices via `/to-tickets`. Its job is now: link each *product* criterion to the epic/milestone after which it's testable, and flag any criterion no planned work covers.)
 
 **Skill type:** Discipline. The discipline under test: **the coverage safety net** — anchor a criterion to a milestone only if completing that milestone makes its scenarios pass end-to-end, and surface any criterion that maps to no planned work. Topical relatedness is not coverage.
 

@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Take the current conversation and codebase understanding and produce a **technical design specification, aka tech spec** as the technical companion to the product requirements document (PRD). Do NOT interview the user; synthesize what you already know.
 
-This spec carries **the engineering architectural and implementation decisions** as well as **the technical acceptance criteria** — the non-functional bar (performance, scale, privacy, security, …) the implementation must clear. Those criteria are part of the implementation: when the spec is broken into vertical slices, `/to-issues` includes issues for technical acceptance criterion with the slices they apply to.
+This spec carries **the engineering architectural and implementation decisions** as well as **the technical acceptance criteria** — the non-functional bar (performance, scale, privacy, security, …) the implementation must clear. Those criteria are part of the implementation: when `/to-tickets` breaks the spec into vertical-slice tickets, fold each technical acceptance criterion into the ticket(s) it applies to — `/to-tickets` won't distribute them on its own, so call this out explicitly when you invoke it.
 
 The tech spec's destination is configured per repo. Read `docs/agents/document-locations.md` for where to create the tech spec; run `/setup-m4h-agents4hire` if that file doesn't exist.
 
@@ -57,7 +57,7 @@ The testing decisions that were made. Include:
 
 ## Technical Acceptance Criteria
 
-The non-functional bar the implementation must clear, grouped by category. These are **part of the implementation** — `/to-issues` distributes each into the acceptance criteria of the vertical slice(s) it applies to; they do not become separate issues. Every criterion must be **verifiable**: state a measurable target or a checkable assertion, not an aspiration ("fast" → "p95 under 200 ms at 100 rps"). It's okay if there aren't criteria in one or more categories listed below, but it's unlikely that there are no acceptance criteria.
+The non-functional bar the implementation must clear, grouped by category. These are **part of the implementation** — fold each into the acceptance criteria of the vertical-slice ticket(s) it applies to when running `/to-tickets`; they do not become separate tickets. (`/to-tickets` doesn't distribute these automatically — say so explicitly when you invoke it.) Every criterion must be **verifiable**: state a measurable target or a checkable assertion, not an aspiration ("fast" → "p95 under 200 ms at 100 rps"). It's okay if there aren't criteria in one or more categories listed below, but it's unlikely that there are no acceptance criteria.
 
 ### Performance
 

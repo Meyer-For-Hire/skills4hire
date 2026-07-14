@@ -1,9 +1,9 @@
 {
   "name": "skills4hire",
-  "description": "Skills for capturing and recalling reusable developer knowledge across projects.",
-  "version": "0.1.0",
+  "description": "Skills for capturing and recalling reusable developer knowledge across projects, plus the M4H product-development workflow.",
+  "version": "0.2.0",
   "author": {
     "name": "Meyer For Hire Consulting, LLC"
   },
-  "keywords": ["skills", "memory", "knowledge", "developer-knowledge"]
+  "keywords": ["skills", "memory", "knowledge", "developer-knowledge", "product-development", "prd", "acceptance-criteria", "domain-modeling"]
 }

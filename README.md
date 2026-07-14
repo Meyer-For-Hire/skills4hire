@@ -35,6 +35,8 @@ Composed disciplines *(model-invoked — reached by the above or autonomously)*:
 
 And: [`/setup-m4h-agents4hire`](skills/setup-m4h-agents4hire/SKILL.md) configures a repo for all of the above. *(user-invoked)*
 
+**Invocation taxonomy:** entries above marked *(user-invoked)* are reachable only by you; entries marked *(model-invoked)* may be reached by the skills above or invoked autonomously by the model — but a user-invoked skill never reaches another user-invoked skill (Matt Pocock's invocation taxonomy, adopted here and in agents4hire).
+
 ## Installation
 
 Add the Meyer For Hire marketplace, then install the plugin.
@@ -57,7 +59,7 @@ claude plugin install skills4hire@m4h-marketplace
 
 **Required for the product-development workflow:**
 
-- [Matt Pocock's skills kit](https://github.com/mattpocock/skills) — the product-development skills compose his `/grilling`, `/grill-with-docs`, `/setup-matt-pocock-skills`, and `/to-issues` skills, and `/sharpen-domain-language` is sliced from his `/domain-modeling`.
+- [Matt Pocock's skills kit](https://github.com/mattpocock/skills), **pinned to v1.1.0 or later** (v1.0 removed/renamed several skills referenced here — see [M4H-18](https://linear.app/meyer-for-hire/issue/M4H-18) for the actual pin) — the product-development skills compose his `/grilling`, `/grill-with-docs`, `/setup-matt-pocock-skills`, and `/to-tickets` skills. `/grill-with-docs` itself now requires his `codebase-design` and `domain-modeling` skills, so installing the kit brings those in too. `/sharpen-domain-language` coexists with — but does not invoke — his `/domain-modeling`: both write the same `CONTEXT.md` in the same format; see [`/sharpen-domain-language`](skills/sharpen-domain-language/SKILL.md#coexisting-with-domain-modeling) for the shared-file convention.
 - **MCP connectors for your configured issue tracker and document store.** The skills are system-agnostic and read their destinations from `docs/agents/`; M4H's default configuration uses the **Linear** and **Google Workspace** connectors.
 
 ## Author

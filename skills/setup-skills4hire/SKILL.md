@@ -1,10 +1,10 @@
 ---
-name: setup-m4h-agents4hire
+name: setup-skills4hire
 description: Configure a repo for the M4H product-definition skills — set up the Linear issue tracker and the document locations for PRDs, tech specs, and acceptance criteria. Run once before first use of the product-definition skills.
 disable-model-invocation: true
 ---
 
-# Setup M4H agents4hire skills
+# Set up skills4hire in this repo
 
 Scaffold the per-repo configuration the M4H product-definition skills assume:
 

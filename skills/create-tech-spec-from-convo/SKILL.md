@@ -10,7 +10,7 @@ Take the current conversation and codebase understanding and produce a **technic
 
 This spec carries **the engineering architectural and implementation decisions** as well as **the technical acceptance criteria** — the non-functional bar (performance, scale, privacy, security, …) the implementation must clear. Those criteria are part of the implementation: when `/to-tickets` breaks the spec into vertical-slice tickets, fold each technical acceptance criterion into the ticket(s) it applies to — `/to-tickets` won't distribute them on its own, so call this out explicitly when you invoke it.
 
-The tech spec's destination is configured per repo. Read `docs/agents/document-locations.md` for where to create the tech spec; run `/setup-m4h-agents4hire` if that file doesn't exist.
+The tech spec's destination is configured per repo. Read `docs/agents/document-locations.md` for where to create the tech spec; run `/setup-skills4hire` if that file doesn't exist.
 
 ## Prerequisites
 

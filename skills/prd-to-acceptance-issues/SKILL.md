@@ -15,7 +15,7 @@ This skill only publishes existing criteria — it doesn't author or edit them, 
 ## Prerequisites
 
 - The **approved PRD** is in context or passed as a reference. Read its Acceptance Criteria section.
-- The **product epic** and the product issue tracker are configured — see `docs/agents/document-locations.md` and `docs/agents/issue-tracker.md`. Run `/setup-m4h-agents4hire` if missing.
+- The **product epic** and the product issue tracker are configured — see `docs/agents/document-locations.md` and `docs/agents/issue-tracker.md`. Run `/setup-skills4hire` if missing.
 
 ## Process
 

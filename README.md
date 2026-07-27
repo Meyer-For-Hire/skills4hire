@@ -17,7 +17,7 @@ question. No preamble, no offers, no decoration. Stays active until you leave it
 
 A set of skills for the M4H/PathX **product-development** workflow, built on top of [Matt Pocock's skills kit](https://github.com/mattpocock/skills). They split product definition from technical design, drive precise domain language, and turn a working conversation into a PRD, a tech spec, and BDD acceptance criteria — keeping **authoring** (writing documents) separate from the **side-effecting** issue creation, which happens only after each document passes review.
 
-Run [`/setup-m4h-agents4hire`](skills/setup-m4h-agents4hire/SKILL.md) once per repo first — it records where documents go (`docs/agents/document-locations.md`) and the issue-tracker coordinates (`docs/agents/issue-tracker.md`) the other skills read.
+Run [`/setup-skills4hire`](skills/setup-skills4hire/SKILL.md) once per repo first — it records where documents go (`docs/agents/document-locations.md`) and the issue-tracker coordinates (`docs/agents/issue-tracker.md`) the other skills read.
 
 The flow, roughly in order:
 
@@ -33,7 +33,7 @@ Composed disciplines *(model-invoked — reached by the above or autonomously)*:
 - [`/sharpen-domain-language`](skills/sharpen-domain-language/SKILL.md) — build and sharpen the ubiquitous language with a product owner; sliced from Pocock's `/domain-modeling` with ADRs and code cross-referencing removed.
 - [`/map-product-acceptance-to-issues`](skills/map-product-acceptance-to-issues/SKILL.md) — record a one-way reference from each product acceptance-criterion issue to the implementation work after which it's testable (nothing written to the implementation side); flag criteria no planned work covers.
 
-And: [`/setup-m4h-agents4hire`](skills/setup-m4h-agents4hire/SKILL.md) configures a repo for all of the above. *(user-invoked)*
+And: [`/setup-skills4hire`](skills/setup-skills4hire/SKILL.md) configures a repo for all of the above. *(user-invoked)*
 
 **Invocation taxonomy:** entries above marked *(user-invoked)* are reachable only by you; entries marked *(model-invoked)* may be reached by the skills above or invoked autonomously by the model — but a user-invoked skill never reaches another user-invoked skill (Matt Pocock's invocation taxonomy, adopted here and in agents4hire).
 

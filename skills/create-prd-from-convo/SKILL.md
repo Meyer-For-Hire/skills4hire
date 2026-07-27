@@ -12,7 +12,7 @@ This PRD is **product-facing**. It carries no implementation or testing decision
 
 This skill **writes a document; it does not create issues.** The PRD (acceptance criteria included) goes to the configured PRD location. Turning the acceptance criteria into tracker issues is a separate, deliberate step — see "After the PRD" below.
 
-The PRD's destination is configured per repo. Read `docs/agents/document-locations.md` for where to create it; run `/setup-m4h-agents4hire` if that file doesn't exist.
+The PRD's destination is configured per repo. Read `docs/agents/document-locations.md` for where to create it; run `/setup-skills4hire` if that file doesn't exist.
 
 ## Prerequisites
 

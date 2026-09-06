@@ -97,7 +97,7 @@ demonstrably read cannot be a coverage gap:
   coverage or in rules — a rule that did not distinguish two findings on one line.
 
 Those three drove the refactor: rules 3.3, 4.5 and 7.5 each gained an explicit
-test question, in the shape that worked for counts. Rules 8.5/8.6 gained the
+test question, in the shape that worked for counts. Rules 8.4/8.5 gained the
 mechanical-fix bound, which cut roughly 12 findings of noise from a 75-finding
 report on `pathx#104`.
 

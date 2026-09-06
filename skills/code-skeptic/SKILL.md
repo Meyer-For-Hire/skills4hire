@@ -5,7 +5,8 @@ description: Use when reviewing a pull request, a stack of dependent pull reques
 
 # Code Skeptic
 
-**Announce at start:** "I'm using the code-skeptic skill to review this change."
+**Announce at start:** "I'm using the M4H skills4hire/code-skeptic skill to review
+this change."
 
 A reviewer for prose, names, and test hygiene — the parts of a change a type
 checker cannot reach. Correctness review is a separate axis and a separate pass;

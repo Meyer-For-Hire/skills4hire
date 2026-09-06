@@ -79,7 +79,8 @@ replacement.
 > is observed or predicted. Prevents double counting because we keep forecast rows
 > even after actuals for the same program and term are added.
 
-**2.5 Expiring content in a tracked file.** Status, next steps, what is done.
+**2.5 Status, next steps, what's done all belong in the ticketing system on the
+ticket we're working on, not in the codebase.**
 > Move all of this (and any other comments/docs that become stale once we've run
 > this) to the Linear ticket instead.
 
@@ -90,10 +91,6 @@ list form.
 
 **2.7 A comment attached to the wrong thing.** A file-level block sitting directly
 above a type becomes that type's hover documentation.
-
-**2.8 Praise is a finding too, when it is about placement.**
-> I like that we're documenting the assumptions connecting these dates here. Right
-> thing to do, right place for it.
 
 ## 3. Names
 
@@ -111,8 +108,8 @@ is not top ten.
 > Would a competent engineer on this project have to look something up to read
 > this line?
 
-If yes, the line needs a term that needs no lookup, or an entry in `CONTEXT.md`.
-Two shapes:
+If yes, the line needs a term that needs no lookup, or an entry in whatever file
+this project treats as its glossary. The shapes it takes:
 
 - **Coined vocabulary** — a term defined nowhere, invented by this change.
   > `dense_grid` is jargon you invented. What does it mean, and what's a better
@@ -121,16 +118,31 @@ Two shapes:
   > "narrative boost" is jargon.
 
 - **Specialized notation** — a scheme that *is* defined, in a field not everyone
-  here has been through. `[a, b)`, big-O, set-builder, regex in prose, statistical
-  shorthand.
+  here has been through. It takes two things to make it a finding, and it needs
+  both: the notation sits outside what a working engineer can be expected to have
+  met, and it is easy to read past without noticing you have misread it. Big-O,
+  regex in prose, and the algebra shorthand — ∆, ∑ — clear the first bar; expect
+  them and don't flag them. Interval notation fails both bars: `[a, b)` is not
+  common knowledge, and the difference between `]` and `)` inside a dense
+  paragraph is one character nobody's eye stops on. `iff` fails both the same way
+  — a reader who has not done formal logic sees "if", and one who has still reads
+  past the second `f`.
   > Please stop using interval notation. It's not expected knowledge among all the
   > engineers who may work on this project and it's subtle enough to easily miss.
 
-The second shape is the harder one to catch and the more dangerous one to leave,
-because it reads as ordinary prose. A coined term stops a reader — they know they
-don't know it. Notation doesn't: a reader with some advanced maths behind them
-reads `[2024, 2027)` fluently and half of them include 2027. Nothing about the
-line looks like a defect, which is exactly why you walk past it.
+- **A named phenomenon** — an effect, law, or distribution named after a person:
+  defined in the literature, invisible outside it. Ask first whether the change
+  needs the term at all; where it does, spell out what it means and cite a source
+  a non-specialist can follow.
+> Spell it out here, with links to either Wikipedia or an authoritative, complete
+> source that's freely available and explains in reasonable layman's terms the
+> point you're getting at.
+
+Notation is the hardest of these to catch and the most dangerous to leave, because
+it reads as ordinary prose. A coined term stops a reader — they know they don't
+know it. Notation doesn't: a reader with some advanced maths behind them reads
+`[2024, 2027)` fluently and half of them include 2027. Nothing about the line
+looks like a defect, which is exactly why you walk past it.
 
 **3.4 Sweep for every instance.** Coined vocabulary and notation spread. When you
 find one, find the rest — including in `AGENTS.md`, `README.md` and docs — and
@@ -183,7 +195,7 @@ first time either layer moves independently.
 > Badly named because this is an assertion that only applies to datasets with a
 > `basis` column. [...] I wouldn't expect the model to fail validation as it
 > doesn't (or shouldn't) know anything about the intended dates of the synthetic
-> dataset. I may be misreading, so if I am, please respond and explain why.
+> dataset.
 
 **4.6 Comments inside tests carry the same rules as any other comment.**
 > The "later boundary" part of the comment is unnecessary. We're testing awards.
@@ -199,39 +211,41 @@ first time either layer moves independently.
 > Renumber this ADR to -0085 to avoid a conflict with PR #113 which already has
 > -0082.
 
-**5.2 One line per paragraph in Markdown.**
-> Don't impose hard line breaks. Each paragraph should be one line; let the
-> renderer handle line breaks.
+**5.2 Revise a corrected doc to read correctly for current state.** A reader
+should not have to hold the document and its corrections side by side and work out
+what is true now. Never append a dated correction or an errata block — ADRs
+included, which look append-only and are not. Keep history in the document only
+where the mistake itself is the lesson and someone would otherwise repeat it; the
+repository carries the rest.
 
-**5.3 A technical claim in an ADR must survive scrutiny.** Where an ADR asserts
-something statistical or mathematical, check it rather than accepting it, and ask
-for a citation a non-specialist can follow.
-> Spell it out here, with links to either Wikipedia or an authoritative, complete
-> source that's freely available and explains in reasonable layman's terms the
-> point you're getting at.
+**5.3 Vocabulary in docs follows the glossary.**
 
-**5.4 Revise a wrong doc so it reads correctly to a first-time reader.** Never
-append a dated correction or an errata block, ADRs included.
-
-**5.5 Vocabulary in docs follows the glossary.**
-> Remove the "catalog" reference ... "dataset artifact" and "base tables".
-
-**5.6 A convention that other agents must follow belongs in an ADR.**
+**5.4 A convention that other agents must follow must be documented in one of the
+places agents will look for it.** `AGENTS.md` for how work gets done here,
+`CONTEXT.md` for what the words mean, an ADR for a decision and the reasoning
+behind it, a docs page for detail too long to sit in any of them. Choose by what
+an agent needs at the moment it needs it: a rule every session must obey belongs
+where every session already reads, and a rule that binds only whoever touches one
+subsystem belongs beside that subsystem, referenced from the top rather than
+inlined there. A convention written nowhere gets violated; one written everywhere
+costs every agent context it had no use for.
 > Do we have this as an ADR so that other agents know to update this list?
 
 ## 6. Messages people read
 
-**6.1 User-facing errors are plain.**
+**6.1 User-facing errors are clear and understandable**, using plain English to
+explain the error as concisely and unambiguously as possible.
 > Less technical error message, please. More like "we couldn't fetch the data."
 
-**6.2 The product never mentions the development pipeline.**
+**6.2 The product never references the development pipeline.**
 > We should NEVER mention ADRs or other details of the development pipeline in the
 > product.
 
 **6.3 A failure message names the actual values involved**, looked up rather than
 assumed — see 1.4.
 
-**6.4 Two errors with the same outcome are one error.**
+**6.4 Two errors with the same outcome are one error** unless the user needs to
+understand the difference.
 > We should consider combining this with the above damaged env check/error message
 > since the outcome is the same.
 
@@ -274,8 +288,8 @@ line is a finding however correct the change itself is — the next integration
 reverts it, silently and with nothing to conflict against.
 
 **7.7 Unrelated churn** — a lockfile re-resolve, an alphabetical reorder, a
-constraint relaxation with no data behind it — belongs in its own PR or in the PR
-body.
+whitespace or indentation-only change, a constraint relaxation with no data behind
+it — belongs in its own PR or in the PR body.
 
 ## 8. Review posture
 
@@ -286,15 +300,11 @@ author a category and ask them to solve it.
 
 **8.3 Say what to do.** Not "consider whether", not "worth thinking about".
 
-**8.4 Invite correction when you may be wrong**, and say so in the comment.
-> I may be misreading or misunderstanding this, so if I am, please respond to this
-> comment and explain why that's true.
-
-**8.5 Repetition is the point, where each instance needs a judgment.** The same
+**8.4 Repetition is the point, where each instance needs a judgment.** The same
 defect at fourteen lines gets fourteen comments, because each one needs its own
 replacement text written. It reads as mechanical because it is.
 
-**8.6 One finding for the whole set, where one command fixes it.** Where a single
+**8.5 One finding for the whole set, where one command fixes it.** Where a single
 mechanical action resolves every instance — `pnpm format`, adding a trailing
 newline, a rename your editor can do — that is one finding: name the command, list
 the files it touches, and move on. Fourteen comments saying "add a newline" is
@@ -304,7 +314,7 @@ The dividing line is whether you had to think about each instance. If the
 replacement text differs per line, they are separate findings. If it is the same
 action everywhere, it is one.
 
-**8.7 A finding carries a posting target**, not only a location: the granularity
-it lands at, and — reviewing a stack — the layer it lands on. `SKILL.md`
-§ *Where a finding goes* and § *Reviewing a stack* hold those rules, and this
-catalogue does not repeat them.
+**8.6 A finding carries a posting target**, not only a location: the granularity
+it lands at, and — reviewing a stack — the layer it lands on. `SKILL.md` § *Where
+a finding goes* and § *Reviewing a stack* hold those rules, and this catalogue
+does not repeat them.

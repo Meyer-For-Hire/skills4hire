@@ -6,12 +6,17 @@ A collection of useful skills for many purposes, brought to you by [Meyer For Hi
 
 ### pqa-mode
 
-Enter **PQA** — Precision Question and Answer. Every reply is the tightest thing
-that carries the meaning: one of five forms (yes/no, a number, a date, a bulleted
-list, or "I don't know, but I think …" + one of those), or a single concise
-question. No preamble, no offers, no decoration. Stays active until you leave it.
+Enter **PQA** — Precision Question and Answer. Every reply is the tightest thing that carries the meaning: one of five forms (yes/no, a number, a date, a bulleted list, or "I don't know, but I think …" + one of those), or a single concise question. No preamble, no offers, no decoration. Stays active until you leave it.
 
 **Invoke:** `/skills4hire:pqa-mode` or `/pqa-mode`
+
+### code-skeptic
+
+Review a pull request, a stack of dependent pull requests, a diff or a branch for the things a type checker cannot reach: facts a person has to keep correct by hand, comments carrying change history, names that no longer mean what they say, and tests asserting what their subject cannot know. Every finding is one location, with the comment written out and the replacement name proposed — and it carries a posting target, so line findings land on their line and change-level findings land in the review body. Reviewing a stack, it takes one pass over the whole thing and assigns each finding to a layer.
+
+It is additional to a correctness review, not a substitute for one — pair it with Matt Pocock's `/code-review`.
+
+Rules live in [`skills/code-skeptic/rules.md`](skills/code-skeptic/rules.md); `tests/code-skeptic/` holds the measured recall and cost behind them. *(model-invoked)*
 
 ### Product-development workflow
 
